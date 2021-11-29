@@ -1,6 +1,6 @@
 const Project = require("../models/Project");
 const Users = require("../models/Users");
-const Issue = require("../models/issue");
+const Issue = require("../models/Issue");
 //  creates an issue and adds it to project
 module.exports.addIssueToProject = async (req, res) => {
   try {
