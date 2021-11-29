@@ -1,7 +1,11 @@
 const express = require("express");
 const db = require("./config/mongoose");
 const app = express();
-const port = 8000;
+let port = 8000;
+port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
 const cors = require("cors");
 // middlewares
 app.use(cors());
@@ -26,6 +30,7 @@ app.options("*", cors());
 // });
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static("./public"));
 const passport = require("passport");
 require("./config/passport-jwt")(passport);
 app.use(passport.initialize());

@@ -23,4 +23,5 @@ router.get(
 // redirect to user.js router file
 router.use("/user", require("./user.js"));
 router.use("/project", require("./project"));
+router.use("/issue", require("./issue"));
 module.exports = router;

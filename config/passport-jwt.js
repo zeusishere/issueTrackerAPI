@@ -5,7 +5,6 @@ const path = require("path");
 const Users = require("../models/Users");
 const pathToPublicKey = path.join(__dirname, "..", "/file", "publicRSAkey.pem");
 const PUB_KEY = fs.readFileSync(pathToPublicKey, "utf8");
-// console.log(PUB_KEY);
 // index.js will pass the global object here and this function will configure it
 module.exports = (passport) => {
   passport.use(
@@ -16,7 +15,7 @@ module.exports = (passport) => {
         algorithms: ["RS256"],
       },
       function (jwt_payload, done) {
-        Users.findOne({ id: jwt_payload.sub }, function (err, user) {
+        Users.findById(jwt_payload.sub, function (err, user) {
           // error ocurred and authentication failed
           if (err) {
             return done(err, false);

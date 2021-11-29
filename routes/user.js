@@ -5,4 +5,5 @@ let userController = require("../controller/user");
 router.post("/sign-in", userController.signInUser);
 // post method
 router.post("/sign-up", userController.createUser);
+router.get("/get-users", userController.getUsersByEmail);
 module.exports = router;

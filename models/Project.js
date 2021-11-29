@@ -31,6 +31,12 @@ const projectSchema = new Schema(
         type: String,
       },
     ],
+    issues: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Issue",
+      },
+    ],
   },
   {
     timestamps: true,

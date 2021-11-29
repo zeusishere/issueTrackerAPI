@@ -6,7 +6,6 @@ let {
 } = require("../config/password-utils");
 
 //  post method to create a new user
-// updated to work with api
 module.exports.createUser = async (req, res) => {
   console.log(req.body);
   //   check if user already exists in the database
@@ -27,11 +26,17 @@ module.exports.createUser = async (req, res) => {
         salt: salt,
       },
     });
+    let userWithOutPassword = (({ _id, userName, email, projects }) => {
+      return { _id, userName, email, projects };
+    })(newUser);
     console.log("created new user is ", newUser);
     // redirect
-    return res.json({
+    const TokenObject = issueJWT(userWithOutPassword);
+    return res.status(200).json({
       success: true,
-      message: "successfully created new user",
+      token: TokenObject.token,
+      expiresIn: TokenObject.expires,
+      user: userWithOutPassword,
     });
   }
   // in any other case
@@ -42,12 +47,12 @@ module.exports.createUser = async (req, res) => {
 module.exports.signInUser = (req, res, next) => {
   Users.findOne({ email: req.body.email }, function (err, user) {
     if (err || !user) {
-      console.log("cannot find user ", err);
-      return res
-        .status(401)
-        .json({ success: false, message: "could not find user" });
+      return res.status(401).json({
+        success: false,
+        message:
+          "No such User found in the database.\n Please enter valid credentials",
+      });
     }
-    console.log("User is ", user);
     const isValid = validPassword(
       req.body.password,
       user.password.hash,
@@ -66,9 +71,32 @@ module.exports.signInUser = (req, res, next) => {
         user: userWithOutPassword,
       });
     } else {
-      res
-        .status(401)
-        .json({ success: false, message: "invalid password entered" });
+      res.status(401).json({
+        success: false,
+        message:
+          "No such User found in the database.\n Please enter valid credentials",
+      });
     }
+  });
+};
+// sends all users which match the query to client
+module.exports.getUsersByEmail = async (req, res) => {
+  console.log("query ", req.query);
+  try {
+    let users = await Users.find(
+      {
+        email: { $regex: req.query.email, $options: "i" },
+      },
+      "userName email _id"
+    );
+    return res.json({
+      success: true,
+      message: "get users by email",
+      users: users,
+    });
+  } catch (err) {}
+  return res.json({
+    success: false,
+    message: "there was an error getting users from db",
   });
 };
